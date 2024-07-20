@@ -1,12 +1,12 @@
 # KanbanTxt
 
-This is a lovely editor. This fork is for my hacks on the script to work it work better for me. 
+Gwyrdh - This is a lovely editor. This fork is for my hacks on the script to work it work better for me. 
 
 A light todo.txt editor that display the to do list as a kanban board. See [here](https://github.com/todotxt/todo.txt) for a detailed description of the todo.txt format.
 
 The goal was to have a one file script that open a tkinter GUI to edit my todo.txt files and displaying a kanban view of my tasks.
 
-Gwyrdh - achieved this wonderfully :-)
+Gwyrdh - imho krisnumber24 achieved this wonderfully :-)
 
 ## Prerequisites
 
