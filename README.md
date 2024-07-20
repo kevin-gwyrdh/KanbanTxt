@@ -6,6 +6,8 @@ A light todo.txt editor that display the to do list as a kanban board. See [here
 
 The goal was to have a one file script that open a tkinter GUI to edit my todo.txt files and displaying a kanban view of my tasks.
 
+Gwyrdh - achieved this wonderfully :-)
+
 ## Prerequisites
 
 - Python 3
@@ -41,7 +43,7 @@ You can click on the text in a task card to move the cursor of text editor to th
 
 ### Move a card to an other column
 
-I used the todo.txt priority prefixes to define in which column each task should appear. I am not sure it fully respect the todo.txt format but it does not seems a total nonsense either.
+I used the todo.txt priority prefixes to define in which column each task should appear. I am not sure it fully respect the todo.txt format but it does not seems a total nonsense either.--darkmode
 
 - **(A)** A task in progress and therefore a task with the highest priority. Goes to the *To Do* column.
 - **(B)** The very next step to do when all the tasks in progress are done. It is a *To Do* task tagged as important. 
