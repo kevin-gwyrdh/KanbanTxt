@@ -15,6 +15,8 @@
 # along with this program.  
 # If not, see https://github.com/KrisNumber24/KanbanTxt/blob/main/LICENSE.
 
+# This version has hacks from gwyrdh for personal use.
+
 import os
 import re
 from datetime import date
@@ -23,17 +25,19 @@ from tkinter import filedialog
 import tkinter.font as tkFont
 import argparse
 
+
+
 class KanbanTxtViewer:
 
     THEMES = {
         'LIGHT_COLORS' : {
             "To Do": '#f27272',
-            "In progress": '#00b6e4',
-            "Validation": '#22b57f',
+            "Doing": '#00b6e4',
+            "Wait": '#22b57f',
             "Done": "#8BC34A",
             "To Do-column": '#daecf1',
-            "In progress-column": '#daecf1',
-            "Validation-column": '#daecf1',
+            "Doing-column": '#daecf1',
+            "Wait-column": '#daecf1',
             "Done-column": "#daecf1",
             "important": "#a7083b",
             "project": '#00b6e4',
@@ -49,12 +53,12 @@ class KanbanTxtViewer:
 
         'DARK_COLORS' : {
             "To Do": '#f27272',
-            "In progress": '#00b6e4',
-            "Validation": '#22b57f',
+            "Doing": '#00b6e4',
+            "Wait": '#22b57f',
             "Done": "#8BC34A",
             "To Do-column": '#15151f',
-            "In progress-column": '#15151f',
-            "Validation-column": '#15151f',
+            "Doing-column": '#15151f',
+            "Wait-column": '#15151f',
             "Done-column": "#15151f",
             "important": "#e12360",
             "project": '#00b6e4',
@@ -81,8 +85,8 @@ class KanbanTxtViewer:
         
         self.ui_columns = {
             "To Do": [],
-            "In progress": [],
-            "Validation": [],
+            "Doing": [],
+            "Wait": [],
             "Done": []
         }
 
@@ -107,8 +111,8 @@ class KanbanTxtViewer:
         self.main_window.title('KanbanTxt')
         self.main_window['background'] = self.COLORS['main-background']
         self.main_window['relief'] = 'flat'
-        self.main_window.geometry("%dx%d+%d+%d" % (window_width, window_height, window_x, window_y))
-
+        #self.main_window.geometry("%dx%d+%d+%d" % (window_width, window_height, window_x, window_y))
+        self.main_window.geometry('1700x900+1+1')
         self.FONTS.append(tkFont.Font(name='main', family='arial', size=10, weight=tkFont.NORMAL))
         self.FONTS.append(tkFont.Font(name='h2', family='arial', size=14, weight=tkFont.NORMAL))
         self.FONTS.append(tkFont.Font(name='done-task', family='arial', size='10', overstrike=1))
@@ -167,7 +171,7 @@ class KanbanTxtViewer:
         darkmode_button_border.pack(side="left", padx=(10,0), pady=10, anchor=tk.NE)
         darkmode_button = tk.Label(
             darkmode_button_border, 
-            text='🔆', 
+            text='🔘', 
             relief='flat', 
             bg=self.COLORS['editor-background'], 
             fg=button_color,
@@ -192,20 +196,20 @@ class KanbanTxtViewer:
         tk.Frame(edition_frame, height=1, bg=self.COLORS['main-text']).pack(side='top', fill='x')
 
         # MEMO
-        cheat_sheet = tk.Label(edition_frame, text='------ Memo ------\n'
-            '(A) :  in progress\n'
-            '(B) :  important todo\n'
-            '(C) :  validation\n'
-            'Ctrl + s :  refresh and save\n'
-            'Alt + ↑ / ↓ :  move line up / down\n', 
-            bg=self.COLORS['editor-background'], 
-            anchor=tk.NW, 
-            justify='left', 
-            fg=self.COLORS['main-text'], 
-            font=tkFont.nametofont('main'),
-        )
-        cheat_sheet.pack(side="top", fill="x", padx=10)
-        # MEMO END
+       # cheat_sheet = tk.Label(edition_frame, text='------ Memo ------\n'
+       #    '(A) :  Doing\n'
+       #   '(B) :  important todo\n'
+       #  '(C) :  Wait\n'
+       # 'Ctrl + s :  refresh and save\n'
+       #'Alt + ↑ / ↓ :  move line up / down\n', 
+       # bg=self.COLORS['editor-background'], 
+       #anchor=tk.NW, 
+       #justify='left', 
+       #fg=self.COLORS['main-text'], 
+       #font=tkFont.nametofont('main'),
+       #)
+       #cheat_sheet.pack(side="top", fill="x", padx=10)
+       # MEMO END
 
         # Separator
         tk.Frame(
@@ -235,53 +239,15 @@ class KanbanTxtViewer:
         editor_toolbar = tk.Frame(edition_frame, bg=self.COLORS['editor-background'])
         editor_toolbar.pack(side='top', padx=10, pady=10, fill='both')
 
-        # Move to todo
-        self.create_button(
-            editor_toolbar, 
-            '✅→⚫', 
-            self.COLORS['To Do'], 
-            command=self.move_to_todo
-        ).grid(row=0, sticky='ew', column=0, padx=5, pady=5)
+       
 
-        # Set as important
-        self.create_button(
-            editor_toolbar, 
-            '✅→⚫', 
-            self.COLORS['important'], 
-            command=self.move_to_important
-        ).grid(row=0, sticky='ew', column=1, padx=5, pady=5)
-
-        # Move to In progress
-        self.create_button(
-            editor_toolbar, 
-            '✅→⚫', 
-            self.COLORS['In progress'], 
-            command=self.move_to_in_progress
-        ).grid(row=0, sticky='ew', column=2, padx=5, pady=5)
-
-        # Move to Validation
-        self.create_button(
-            editor_toolbar, 
-            '✅→⚫', 
-            self.COLORS['Validation'], 
-            command=self.move_to_validation
-        ).grid(row=0, sticky='ew', column=3, padx=5, pady=5)
-
-        # Move to Done
-        self.create_button(
-            editor_toolbar, 
-            '✅→⚫', 
-            self.COLORS['Done'], 
-            command=self.move_to_done
-        ).grid(row=0, sticky='ew', column=4, padx=5, pady=5)
-
-        # Move line up
+        # Add date
         self.create_button(
             editor_toolbar, 
             '+ date', 
             self.COLORS['button'], 
             command=self.add_date
-        ).grid(row=1, sticky='ew', column=0, padx=5, pady=5)
+        ).grid(row=0, sticky='ew', column=0, padx=5, pady=5)
 
         # Move line up
         self.create_button(
@@ -289,7 +255,7 @@ class KanbanTxtViewer:
             '↑', 
             self.COLORS['button'], 
             command=self.move_line_up
-        ).grid(row=1, sticky='ew', column=1, padx=5, pady=5)
+        ).grid(row=0, sticky='ew', column=1, padx=5, pady=5)
 
         # Move line down
         self.create_button(
@@ -297,7 +263,7 @@ class KanbanTxtViewer:
             '↓', 
             self.COLORS['button'], 
             command=self.move_line_down
-        ).grid(row=1, sticky='ew', column=2, padx=5, pady=5)
+        ).grid(row=0, sticky='ew', column=2, padx=5, pady=5)
 
         # Delete line
         self.create_button(
@@ -305,7 +271,7 @@ class KanbanTxtViewer:
             'Delete', 
             self.COLORS['button'], 
             command=self.remove_line
-        ).grid(row=1, sticky='ew', column=3, padx=5, pady=5)
+        ).grid(row=0, sticky='ew', column=3, padx=5, pady=5)
 
         editor_toolbar.columnconfigure(0, weight=1, uniform='toolbar-item')
         editor_toolbar.columnconfigure(1, weight=1, uniform='toolbar-item')
@@ -328,7 +294,7 @@ class KanbanTxtViewer:
         self.text_editor.bind('<Control-Key-1>', self.move_to_todo)
         self.text_editor.bind('<Control-Key-2>', self.move_to_important)
         self.text_editor.bind('<Control-Key-3>', self.move_to_in_progress)
-        self.text_editor.bind('<Control-Key-4>', self.move_to_validation)
+        self.text_editor.bind('<Control-Key-4>', self.move_to_Wait)
         self.text_editor.bind('<Control-Key-5>', self.move_to_done)
     
 
@@ -347,7 +313,7 @@ class KanbanTxtViewer:
         self.content_canvas.grid(row=0, column=1, sticky=tk.NSEW, padx=10, pady=10)
         
         # Give more space to the kanban view
-        self.main_window.grid_columnconfigure(1, weight=6)
+        self.main_window.grid_columnconfigure(1, weight=8)
 
         # The frame inside the canvas. It manage the widget displayed inside the canvas
         self.content_frame = tk.Frame(self.content_canvas, bg=self.COLORS['main-background'])
@@ -368,7 +334,7 @@ class KanbanTxtViewer:
         # END SCROLLABLE CANVAS
 
         # Prepare progress bars and kanban itself
-        self.progress_bar = tk.Frame(self.content_frame, height=15, bg=self.COLORS['done-card-background'])
+        self.progress_bar = tk.Frame(self.content_frame, height=30, bg=self.COLORS['done-card-background'])
         self.progress_bar.pack(side='top', fill='x', padx=10, pady=10)
         self.progress_bars = {}
 
@@ -434,7 +400,7 @@ class KanbanTxtViewer:
                 text=bar_label_text, 
                 fg=self.COLORS['main-background'], 
                 bg=self.progress_bars[key]['bar']['bg'], 
-                font=('Arial', 8))
+                font=('Arial', 10))
             self.progress_bars[key]['label'].pack(side='left', padx=5)
             
             sub_bar_pos += 0.25
@@ -504,8 +470,8 @@ class KanbanTxtViewer:
         """Parse a todo txt content and return data as a dictionary"""
         tasks = {
             "To Do": [],
-            "In progress": [],
-            "Validation": [],
+            "Doing": [],
+            "Wait": [],
             "Done": []
         }
 
@@ -548,10 +514,10 @@ class KanbanTxtViewer:
                         task['is_important'] = True
 
                     elif priority == "(A)":
-                        category ='In progress'
+                        category ='Doing'
                     
                     elif priority == "(C)":
-                        category = 'Validation'
+                        category = 'Wait'
 
                 if task['is_important']:
                     important_tasks.append(task)
@@ -599,8 +565,8 @@ class KanbanTxtViewer:
         # Compute proportion for each column tasks and update progress bars
         tasks_number = {
             'To Do': len(tasks["To Do"]),
-            'In progress': len(tasks['In progress']),
-            'Validation': len(tasks['Validation']),
+            'Doing': len(tasks['Doing']),
+            'Wait': len(tasks['Wait']),
             'Done': len(tasks['Done'])
         }
         total_tasks = 0
@@ -611,8 +577,8 @@ class KanbanTxtViewer:
         if total_tasks > 0:
             percentages = {
                 'To Do': tasks_number['To Do'] / total_tasks,
-                'In progress': tasks_number['In progress'] / total_tasks,
-                'Validation': tasks_number['Validation'] / total_tasks,
+                'Doing': tasks_number['Doing'] / total_tasks,
+                'Wait': tasks_number['Wait'] / total_tasks,
                 'Done': tasks_number['Done'] / total_tasks
             }
 
@@ -695,6 +661,7 @@ class KanbanTxtViewer:
         card_label.pack(padx=subject_padx, pady=5, fill='x', side="top", anchor=tk.W)
 
         # If needed show the task duration
+        # Removed 662 - 683
         if start_date:
             duration = 0
             if not end_date:
@@ -712,12 +679,12 @@ class KanbanTxtViewer:
                 bg=ui_card['bg'], 
                 anchor=tk.W, 
                 justify='left',
-                font=("Arial", 8),
+                font=("Arial", 1),
                 wraplength=85, 
 
             )
             if project or context:
-                duration_label.pack(side="top", anchor=tk.NW, padx=10, pady=0)
+                duration_label.pack(side="top", anchor=tk.NW, padx=5, pady=0)
             else:
                 duration_label.pack(side="top", anchor=tk.NW, padx=10, pady=(0,10))
 
@@ -730,17 +697,17 @@ class KanbanTxtViewer:
                 bg=ui_card['bg'], 
                 anchor=tk.E
             )
-            project_label.pack(padx=10, pady=5, fill='x', side="top", anchor=tk.E)
+            project_label.pack(padx=5, pady=1, fill='x', side="top", anchor=tk.E)
         
-        if context:
-            context_label = tk.Label(
-                ui_card, 
-                text=context, 
-                fg=self.COLORS['context'], 
-                bg=ui_card['bg'], 
-                anchor=tk.E
-            )
-            context_label.pack(padx=10, pady=5, fill='x', side="top", anchor=tk.E)
+        #if context:
+        #   context_label = tk.Label(
+        #      ui_card, 
+        #         text=context, 
+          #      fg=self.COLORS['context'], 
+          #      bg=ui_card['bg'], 
+          #      anchor=tk.E
+          #  )
+          #  context_label.pack(padx=10, pady=5, fill='x', side="top", anchor=tk.E)
 
         card_label.bind('<Button-1>', self.highlight_task)
 
@@ -834,6 +801,7 @@ class KanbanTxtViewer:
         # with Windows OS
         event.widget.bind_all("<MouseWheel>", self.scroll)
         # with Linux OS
+        event.widget.bind_all("<Button-3>", self.scroll)
         event.widget.bind_all("<Button-4>", self.scroll)
         event.widget.bind_all("<Button-5>", self.scroll)
     
@@ -843,6 +811,7 @@ class KanbanTxtViewer:
         # with Windows OS
         event.widget.unbind_all("<MouseWheel>")
         # with Linux OS
+        event.widget.unbind_all("<Button-3>")
         event.widget.unbind_all("<Button-4>")
         event.widget.unbind_all("<Button-5>")
 
@@ -920,7 +889,7 @@ class KanbanTxtViewer:
     def move_to_in_progress(self, event=None):
         self.set_editor_line_state('(A)')
 
-    def move_to_validation(self, event=None):
+    def move_to_Wait(self, event=None):
         self.set_editor_line_state('(C)')
     
     def move_to_done(self, event=None):
@@ -994,3 +963,4 @@ if __name__ == '__main__':
     arg_parser.add_argument('--darkmode', help='Is the UI should use dark theme', required=False, action='store_true')
     args = arg_parser.parse_args()
     main(args)
+
