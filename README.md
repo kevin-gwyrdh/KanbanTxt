@@ -1,6 +1,7 @@
 # KanbanTxt
 
 This is a lovely editor. This fork is for my hacks on the script to work it work better for me. 
+It uses KrisNumber24 base and most of draghan changes plus my own tinkering
 
 A light todo.txt editor that display the to do list as a kanban board. See [here](https://github.com/todotxt/todo.txt) for a detailed description of the todo.txt format.
 
